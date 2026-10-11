@@ -1,0 +1,365 @@
+<title>Söğüt Saksısı Deneyi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+/* Düzen: tek sütun, solda hizalı. Ana an: ölçekli "hesap defteri" grafiği; toprak çubuğu neredeyse hiç değişmez. */
+:root {
+  --bg: #EEF2EE;
+  --fg: #14241B;
+  --muted: #4B5E53;
+  --line: #C4D0C6;
+  --panel: #E2EAE3;
+  --willow: #2C7447;
+  --soil: #8A5A3B;
+  --air: #2D6DA6;
+  --co2: #5E5A8C;
+  --on-bar: #FFFFFF;
+  --focus: #2D6DA6;
+  --display: "Bricolage Grotesque", system-ui, "Segoe UI", sans-serif;
+  --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1612;
+    --fg: #E3EDE5;
+    --muted: #9AAEA1;
+    --line: #2A3A30;
+    --panel: #15211A;
+    --willow: #5FC285;
+    --soil: #C58B65;
+    --air: #6DB0EA;
+    --co2: #B0AAE8;
+    --on-bar: #0B120E;
+    --focus: #6DB0EA;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1612;
+  --fg: #E3EDE5;
+  --muted: #9AAEA1;
+  --line: #2A3A30;
+  --panel: #15211A;
+  --willow: #5FC285;
+  --soil: #C58B65;
+  --air: #6DB0EA;
+  --co2: #B0AAE8;
+  --on-bar: #0B120E;
+  --focus: #6DB0EA;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: 400 1.0625rem/1.65 var(--body);
+  padding-inline: clamp(16px, 5vw, 48px);
+  padding-block: clamp(28px, 6vw, 64px);
+}
+.wrap { max-width: 1040px; margin: 0 auto; display: grid; gap: clamp(48px, 8vw, 96px); }
+section { display: grid; gap: 24px; border-top: 1px solid var(--line); padding-top: 24px; min-width: 0; }
+header.hero { display: grid; gap: 28px; }
+p { margin: 0; max-width: 62ch; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; letter-spacing: -0.02em; }
+h1 { font-weight: 700; font-size: clamp(2.5rem, 8vw, 5rem); line-height: 0.98; letter-spacing: -0.03em; max-width: 14ch; }
+h2 { font-weight: 700; font-size: clamp(1.6rem, 4vw, 2.2rem); line-height: 1.1; }
+h3 { font-weight: 600; font-size: 1.25rem; line-height: 1.2; }
+.eyebrow { font: 500 0.75rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.lead { font-size: 1.25rem; line-height: 1.55; }
+
+.big { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 1rem; font: 700 clamp(2.2rem, 7vw, 4rem)/1.05 var(--display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.big .arrow { color: var(--muted); font-weight: 500; }
+.big .w { color: var(--willow); }
+.big-note { font: 500 0.9rem/1.4 var(--mono); color: var(--muted); }
+.big-note b { color: var(--soil); font-weight: 500; }
+
+dl.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px 32px; margin: 0; }
+dl.facts > div { border-top: 1px solid var(--line); padding-top: 12px; min-width: 0; }
+dl.facts dt { font: 500 0.75rem/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+dl.facts dd { margin: 0; font: 600 1.2rem/1.3 var(--display); }
+dl.facts dd small { display: block; font: 400 0.9rem/1.4 var(--body); color: var(--muted); margin-top: 4px; }
+
+.method { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 32px 56px; align-items: center; }
+@media (max-width: 720px) { .method { grid-template-columns: minmax(0, 1fr); } }
+.pot { width: 100%; max-width: 380px; height: auto; display: block; }
+.pot .svgt { font: 500 13px var(--mono); fill: var(--fg); }
+.pot .on-soil { font: 500 13px var(--mono); fill: var(--on-bar); }
+.pot .f-soil { fill: var(--soil); }
+.pot .f-willow { fill: var(--willow); }
+.pot .f-lid { fill: var(--muted); }
+.pot .s-willow { stroke: var(--willow); fill: none; stroke-width: 4; stroke-linecap: round; }
+.pot .s-air { stroke: var(--air); stroke-width: 2.5; stroke-linecap: round; fill: none; }
+.pot .t-air { fill: var(--air); }
+
+ol.steps { list-style: none; margin: 0; padding: 0; counter-reset: step; display: grid; }
+ol.steps li { counter-increment: step; display: grid; grid-template-columns: 2.25rem minmax(0, 1fr); gap: 4px; padding: 14px 0; border-top: 1px solid var(--line); }
+ol.steps li:first-child { border-top: 0; padding-top: 0; }
+ol.steps li::before { content: counter(step); font: 500 0.9rem/1.9 var(--mono); color: var(--willow); }
+
+.ledger { display: grid; gap: 28px; min-width: 0; }
+.grp { display: grid; gap: 10px; min-width: 0; }
+.grp h3 { font-size: 1.05rem; }
+.row { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 12px; align-items: center; }
+.row .lab { font: 500 0.8rem/1.2 var(--mono); color: var(--muted); }
+.track { height: 2.25rem; display: flex; align-items: center; background: linear-gradient(to right, var(--line) 1px, transparent 1px) 0 0 / 25% 100%; border-right: 1px solid var(--line); min-width: 0; }
+.bar { height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: var(--on-bar); font: 500 0.82rem/1 var(--mono); white-space: nowrap; flex: none; }
+.bar.w { background: var(--willow); }
+.bar.s { background: var(--soil); }
+.out { margin-left: 8px; font: 500 0.82rem/1 var(--mono); color: var(--fg); white-space: nowrap; }
+.axis { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 12px; }
+.axis .ticks { position: relative; height: 1.25rem; font: 400 0.75rem/1 var(--mono); color: var(--muted); }
+.axis .ticks span { position: absolute; top: 0; transform: translateX(-50%); }
+.axis .ticks span:first-child { transform: none; }
+.axis .ticks span:last-child { transform: translateX(-100%); }
+@media (max-width: 560px) {
+  .row, .axis { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .axis > :first-child { display: none; }
+}
+.reading { display: grid; gap: 12px; }
+
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+.seg button { font: 600 0.95rem/1 var(--display); padding: 0.75rem 1.1rem; background: transparent; color: var(--fg); border: 0; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.panel { display: grid; gap: 16px; padding: 24px; background: var(--panel); border-radius: 8px; min-width: 0; }
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.node { border: 1.5px solid var(--fg); padding: 0.55rem 0.9rem; border-radius: 6px; font: 600 1rem/1.2 var(--display); }
+.node.water { border-color: var(--air); color: var(--air); }
+.node.co2 { border-color: var(--co2); color: var(--co2); }
+.node.light { border-style: dashed; color: var(--muted); border-color: var(--muted); }
+.node.mass { background: var(--willow); border-color: var(--willow); color: var(--on-bar); }
+.op { font: 500 1.25rem/1 var(--mono); color: var(--muted); }
+
+.exps { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 32px; }
+.exp { display: grid; gap: 12px; border-top: 1px solid var(--line); padding-top: 14px; align-content: start; min-width: 0; }
+.exp dl { margin: 0; display: grid; gap: 10px; }
+.exp dt { font: 500 0.72rem/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.exp dd { margin: 0; }
+
+.q { display: grid; gap: 12px; border-top: 1px solid var(--line); padding-top: 16px; }
+.q:first-of-type { border-top: 0; padding-top: 0; }
+.qt { font: 600 1.1rem/1.35 var(--display); max-width: 60ch; }
+.opts { display: grid; gap: 8px; max-width: 520px; }
+.opt { text-align: left; font: inherit; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 0.65rem 0.9rem; cursor: pointer; display: flex; justify-content: space-between; gap: 12px; }
+.opt:hover:not(:disabled) { border-color: var(--fg); }
+.opt:disabled { cursor: default; }
+.opt.ok { border-color: var(--willow); border-width: 2px; }
+.opt.bad { border-color: var(--soil); border-width: 2px; }
+.opt .tag { font: 500 0.75rem/1.6 var(--mono); white-space: nowrap; }
+.opt.ok .tag { color: var(--willow); }
+.opt.bad .tag { color: var(--soil); }
+.why { color: var(--muted); font-size: 0.98rem; }
+.score { font: 500 0.9rem/1 var(--mono); color: var(--muted); }
+.note { font: 400 0.85rem/1.5 var(--mono); color: var(--muted); max-width: 70ch; }
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Biyoloji tarihi · Flandre, 1600'lerin ilk yarısı</div>
+    <h1>Bir söğüt, bir saksı, beş yıl</h1>
+    <p class="lead">Jan Baptist van Helmont bir söğüt fidanını 5 yıl boyunca yalnızca yağmur suyuyla besledi, sonra bitkiyi ve toprağı tarttı. Bitkilerin kütlesini topraktan aldığı düşüncesi bu tartıda sarsıldı.</p>
+    <div>
+      <div class="big"><span>2,3 kg</span><span class="arrow">→</span><span class="w">76 kg</span></div>
+      <div class="big-note">Söğütün ağırlığı. Toprak ise yalnızca <b>57 g</b> azaldı.</div>
+    </div>
+  </header>
+
+  <section id="ozet" aria-labelledby="ozet-b">
+    <h2 id="ozet-b">Bir bakışta</h2>
+    <dl class="facts">
+      <div><dt>Deneyi yapan</dt><dd>Jan Baptist van Helmont<small>Flamanlı bilim insanı</small></dd></div>
+      <div><dt>Yayım</dt><dd>1648<small>Ölümünden sonra yayımlandı</small></dd></div>
+      <div><dt>Süre</dt><dd>5 yıl<small>Yalnızca yağmur suyu</small></dd></div>
+      <div><dt>Soru</dt><dd>Bitki kütlesi nereden gelir?<small>O dönemde cevap "topraktan" sanılıyordu</small></dd></div>
+    </dl>
+  </section>
+
+  <section id="yontem" aria-labelledby="yontem-b">
+    <h2 id="yontem-b">Yöntem</h2>
+    <div class="method">
+      <svg class="pot" viewBox="0 0 360 300" role="img" aria-labelledby="potT potD">
+        <title id="potT">Deney düzeneği</title>
+        <desc id="potD">Kapaklı bir saksıda yaklaşık 90 kg toprak ve içinde 2,3 kg ağırlığında bir söğüt fidanı bulunuyor. Fidana yağmur suyu veriliyor.</desc>
+        <path class="s-air" d="M34 22 l-8 16 M62 14 l-8 16 M90 22 l-8 16"/>
+        <text class="svgt t-air" x="108" y="34" style="fill:var(--air)">yağmur suyu</text>
+        <path class="s-willow" d="M180 150 C178 122 182 100 180 72"/>
+        <ellipse class="f-willow" cx="167" cy="102" rx="12" ry="4.5" transform="rotate(-35 167 102)"/>
+        <ellipse class="f-willow" cx="193" cy="94" rx="12" ry="4.5" transform="rotate(35 193 94)"/>
+        <ellipse class="f-willow" cx="166" cy="128" rx="12" ry="4.5" transform="rotate(-40 166 128)"/>
+        <ellipse class="f-willow" cx="194" cy="120" rx="12" ry="4.5" transform="rotate(40 194 120)"/>
+        <ellipse class="f-willow" cx="180" cy="70" rx="4.5" ry="11"/>
+        <text class="svgt" x="216" y="88">2,3 kg</text>
+        <text class="svgt" x="216" y="104">söğüt fidanı</text>
+        <rect class="f-lid" x="84" y="146" width="84" height="6" rx="2"/>
+        <rect class="f-lid" x="192" y="146" width="84" height="6" rx="2"/>
+        <text class="svgt" x="286" y="140">kapak</text>
+        <path class="f-soil" d="M84 152 H276 L258 272 Q257 280 248 280 H112 Q103 280 102 272 Z"/>
+        <text class="on-soil" x="180" y="214" text-anchor="middle">~90 kg toprak</text>
+        <text class="on-soil" x="180" y="236" text-anchor="middle">5 yıl sonra: −57 g</text>
+      </svg>
+      <ol class="steps">
+        <li><span>Büyük bir saksıya yaklaşık 90 kg (200 libre) kurutulmuş toprak koydu.</span></li>
+        <li><span>Yaklaşık 2,3 kg (5 libre) ağırlığındaki söğüt fidanını dikti.</span></li>
+        <li><span>Bitkiyi 5 yıl boyunca yalnızca yağmur suyuyla (saf su) suladı.</span></li>
+        <li><span>Toprağa toz girmesin diye saksının üstünü kapattı.</span></li>
+        <li><span>5 yıl sonra söğütü ve toprağı yeniden tarttı.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="sonuc" aria-labelledby="sonuc-b">
+    <h2 id="sonuc-b">Sonuç: tartı ne gösterdi?</h2>
+    <div class="ledger" role="img" aria-label="Çubuk grafik. Söğüt 2,3 kg'dan 76 kg'a çıktı. Toprak yaklaşık 90 kg'dan yaklaşık 90 kg'a indi; kayıp yalnızca 57 gram.">
+      <div class="grp">
+        <h3>Söğüt</h3>
+        <div class="row"><span class="lab">Başlangıç</span><div class="track"><div class="bar w" style="width:2.3%"></div><span class="out">2,3 kg</span></div></div>
+        <div class="row"><span class="lab">5 yıl sonra</span><div class="track"><div class="bar w" style="width:76%">76 kg</div></div></div>
+      </div>
+      <div class="grp">
+        <h3>Toprak</h3>
+        <div class="row"><span class="lab">Başlangıç</span><div class="track"><div class="bar s" style="width:90%">90 kg</div></div></div>
+        <div class="row"><span class="lab">5 yıl sonra</span><div class="track"><div class="bar s" style="width:89.9%">≈ 90 kg · −57 g</div></div></div>
+      </div>
+      <div class="axis"><span></span><div class="ticks" aria-hidden="true"><span style="left:0%">0</span><span style="left:25%">25</span><span style="left:50%">50</span><span style="left:75%">75</span><span style="left:100%">100 kg</span></div></div>
+    </div>
+    <div class="reading">
+      <p>Söğüt yaklaşık 74 kg kazandı. Toprağın kaybı 57 gramdı; bu, 90 kg'ın binde 1'inden az olduğu için grafikte iki toprak çubuğu aynı görünür.</p>
+      <p class="note">Rakamlar yaklaşık değerlerdir. Libre, kilograma çevrilmiştir (1 libre ≈ 0,45 kg).</p>
+    </div>
+  </section>
+
+  <section id="yorum" aria-labelledby="yorum-b">
+    <h2 id="yorum-b">Kütle nereden geldi?</h2>
+    <div class="seg" role="group" aria-label="Açıklama seç">
+      <button type="button" id="b-vh" aria-pressed="true" data-view="vh">Van Helmont'un yorumu</button>
+      <button type="button" id="b-modern" aria-pressed="false" data-view="modern">Bugünkü bilgi</button>
+    </div>
+    <div class="panel" id="p-vh">
+      <div class="flow">
+        <span class="node water">Yağmur suyu</span><span class="op">→</span><span class="node mass">Söğüt kütlesi</span>
+      </div>
+      <p>Toprak neredeyse hiç azalmadığı için Van Helmont bitkinin kütle kazanımını suya bağladı. Toprağın bitki kütlesine neredeyse hiç katkı yapmadığını göstermesi doğruydu. Yorumun geri kalanı yarımdı.</p>
+    </div>
+    <div class="panel" id="p-modern" hidden>
+      <div class="flow">
+        <span class="node water">Su</span><span class="op">+</span><span class="node co2">Havadaki karbondioksit</span><span class="op">+</span><span class="node light">Işık enerjisi</span><span class="op">→</span><span class="node mass">Söğüt kütlesi</span>
+      </div>
+      <p>Bitki kütlesinin büyük kısmı havadaki karbondioksitten gelir (fotosentez). Su da katkı yapar ama tek kaynak değildir. Işık madde değil, dönüşümü sağlayan enerjidir.</p>
+    </div>
+    <p>Deney, ölçüme dayanan ilk nicel biyoloji deneylerinden biri sayılır ve fotosentezin keşfine giden yolda bir basamak oldu.</p>
+  </section>
+
+  <section id="okul" aria-labelledby="okul-b">
+    <h2 id="okul-b">Okulda yapılan saksı deneyleri</h2>
+    <p>Fen derslerinde "saksı deneyi" çoğunlukla şu üçünden biridir. Hepsinde bir seferde yalnızca bir şeyi değiştir, diğerlerini sabit tut.</p>
+    <div class="exps">
+      <div class="exp">
+        <h3>Fasulye veya nohut çimlendirme</h3>
+        <dl>
+          <div><dt>Değiştir</dt><dd>Işık, su veya sıcaklık (yalnızca biri)</dd></div>
+          <div><dt>Ölç</dt><dd>Filizlenen tohum sayısı ve filiz boyu</dd></div>
+        </dl>
+      </div>
+      <div class="exp">
+        <h3>Fototropizm</h3>
+        <dl>
+          <div><dt>Değiştir</dt><dd>Saksıya ışığın geldiği yön</dd></div>
+          <div><dt>Ölç</dt><dd>Gövdenin hangi yöne ve ne kadar eğildiği</dd></div>
+        </dl>
+      </div>
+      <div class="exp">
+        <h3>Toprakta su tutma</h3>
+        <dl>
+          <div><dt>Değiştir</dt><dd>Toprak türü (kum, bahçe toprağı, kil)</dd></div>
+          <div><dt>Ölç</dt><dd>Aynı miktarda suyun ne kadarının süzüldüğü</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section id="quiz-s" aria-labelledby="quiz-b">
+    <h2 id="quiz-b">Kendini dene</h2>
+    <div id="quiz"></div>
+    <div class="score" id="score" aria-live="polite">Doğru: 0 / 3</div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  var vh = document.getElementById('p-vh');
+  var md = document.getElementById('p-modern');
+  var bvh = document.getElementById('b-vh');
+  var bmd = document.getElementById('b-modern');
+  function show(view) {
+    var isVh = view === 'vh';
+    vh.hidden = !isVh;
+    md.hidden = isVh;
+    bvh.setAttribute('aria-pressed', String(isVh));
+    bmd.setAttribute('aria-pressed', String(!isVh));
+  }
+  bvh.addEventListener('click', function () { show('vh'); });
+  bmd.addEventListener('click', function () { show('modern'); });
+
+  var items = [
+    { q: 'Van Helmont söğüdü kaç yıl boyunca yalnızca yağmur suyuyla besledi?',
+      o: ['1 yıl', '5 yıl', '10 yıl'], a: 1,
+      why: 'Fidanı 5 yıl boyunca yalnızca yağmur suyuyla suladı.' },
+    { q: 'Deney sonunda toprağın ağırlığı ne kadar azaldı?',
+      o: ['Yaklaşık 57 gram', 'Yaklaşık 5 kg', 'Yaklaşık 20 kg'], a: 0,
+      why: 'Toprak yaklaşık 90 kg\'dı ve yalnızca yaklaşık 57 gram azaldı.' },
+    { q: 'Bitki kütlesinin büyük kısmı bugün hangi kaynağa bağlanıyor?',
+      o: ['Topraktaki mineraller', 'Havadaki karbondioksit', 'Yalnızca su'], a: 1,
+      why: 'Fotosentezde bitki, havadaki karbondioksiti kütlesine katar. Su da katkı yapar ama tek kaynak değildir.' }
+  ];
+  var root = document.getElementById('quiz');
+  var scoreEl = document.getElementById('score');
+  var score = 0;
+
+  items.forEach(function (it) {
+    var box = document.createElement('div');
+    box.className = 'q';
+    var qt = document.createElement('p');
+    qt.className = 'qt';
+    qt.textContent = it.q;
+    var opts = document.createElement('div');
+    opts.className = 'opts';
+    var why = document.createElement('p');
+    why.className = 'why';
+    why.hidden = true;
+    why.textContent = it.why;
+    var btns = [];
+    it.o.forEach(function (label, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      var t = document.createElement('span');
+      t.textContent = label;
+      var tag = document.createElement('span');
+      tag.className = 'tag';
+      b.appendChild(t);
+      b.appendChild(tag);
+      b.addEventListener('click', function () {
+        btns.forEach(function (x, j) {
+          x.disabled = true;
+          if (j === it.a) { x.classList.add('ok'); x.querySelector('.tag').textContent = 'doğru'; }
+        });
+        if (i === it.a) { score += 1; }
+        else { b.classList.add('bad'); tag.textContent = 'yanlış'; }
+        why.hidden = false;
+        scoreEl.textContent = 'Doğru: ' + score + ' / ' + items.length;
+      });
+      btns.push(b);
+      opts.appendChild(b);
+    });
+    box.appendChild(qt);
+    box.appendChild(opts);
+    box.appendChild(why);
+    root.appendChild(box);
+  });
+})();
+</script>
